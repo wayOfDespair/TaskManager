@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using TaskManager.Models;
+using Task = TaskManager.Models.Task;
 
 namespace TaskManager.Controllers
 {
@@ -11,31 +11,27 @@ namespace TaskManager.Controllers
     [Route("[controller]")]
     public class TaskController : Controller
     {
-        private readonly IList<Task> _tasks = new List<Task>
+        private readonly DatabaseContext _context;
+
+        public TaskController(DatabaseContext context)
         {
-            new Task {Id = 0, Author = "test author", Description = "test description", DateCreated = DateTime.Now, ExpirationDate = DateTime.Now.AddDays(7)},
-            new Task {Id = 1, Author = "despair", Description = "description", DateCreated = DateTime.Now, ExpirationDate = DateTime.Now.AddDays(14)},
-        };
+            _context = context;
+        }
         
+
         [HttpGet]
-        public IEnumerable<Task> Get(int? id)
+        public async Task<IEnumerable<Task>> Get(int? id)
         {
-            if (id != null && id > 0 && id < _tasks.Count)
-            {
-                return _tasks.Where(task => task.Id == id);
-            }
-            return _tasks;
+            return await _context.Tasks.ToListAsync();
         }
 
         [HttpPost]
-        public IActionResult Post(string task)
+        public async Task<IActionResult> Post(string jsonTask)
         {
-            if (task != null)
-            {
-                _tasks.Add(JsonConvert.DeserializeObject<Task>(task));
-            }
-
-            return Ok();
+            var task = (jsonTask != null) ? JsonConvert.DeserializeObject<Task>(jsonTask) : new Task();
+            await _context.Tasks.AddAsync(task);
+            
+            return Ok("Task added.");
         }
     }
 }

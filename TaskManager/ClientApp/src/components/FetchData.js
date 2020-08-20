@@ -18,8 +18,10 @@ export class FetchData extends Component {
         <thead>
           <tr>
             <th>Id</th>
-            <th>Author</th>
+            <th>Employee</th>
             <th>Description</th>
+            <th>Priority</th>
+            <th>Severity</th>
             <th>Date created</th>
             <th>Expiration date</th>
           </tr>
@@ -27,11 +29,13 @@ export class FetchData extends Component {
         <tbody>
           {tasks.map(task =>
             <tr key={task.id}>
-              <td>{task.id}</td>
+              <td>{task.taskId}</td>
               <td>{task.author}</td>
               <td>{task.description}</td>
-              <td>{task.dateCreated}</td>
-              <td>{task.expirationDate}</td>
+              <td>{task.priority}</td>
+              <td>{task.severity}</td>
+              <td>{this.formatDate(task.dateCreated)}</td>
+              <td>{this.formatDate(task.expirationDate)}</td>
             </tr>
           )}
         </tbody>
@@ -57,5 +61,10 @@ export class FetchData extends Component {
     const response = await fetch('task');
     const data = await response.json();
     this.setState({ forecasts: data, loading: false });
+  }
+  
+  static formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toString().slice(0, 24);
   }
 }
