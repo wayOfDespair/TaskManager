@@ -7,5 +7,10 @@ namespace TaskManager.Models
         public int DepartmentId { get; set; }
         public string Name { get; set; }
         public List<Employee> Employees { get; set; }
+
+        public bool IsValid()
+        {
+            return Name != null;
+        }
     }
 }

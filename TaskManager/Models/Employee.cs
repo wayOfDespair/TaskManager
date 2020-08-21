@@ -10,5 +10,10 @@ namespace TaskManager.Models
         public string LastName { get; set; }
         public Department Department { get; set; }
         public List<Task> Tasks { get; set; }
+
+        public bool IsValid()
+        {
+            return Name != null && LastName != null;
+        }
     }
 }

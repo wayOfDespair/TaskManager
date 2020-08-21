@@ -12,7 +12,7 @@ export class FetchData extends Component {
     this.populateTasks();
   }
 
-  static renderForecastsTable(tasks) {
+  static renderTasksTable(tasks) {
     return (
       <table className='table table-striped' aria-labelledby="tabelLabel">
         <thead>
@@ -43,10 +43,15 @@ export class FetchData extends Component {
     );
   }
 
+  static formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toString().slice(0, 24);
+  }
+
   render() {
     let contents = this.state.loading
       ? <p><em>Loading...</em></p>
-      : FetchData.renderForecastsTable(this.state.forecasts);
+      : FetchData.renderTasksTable(this.state.forecasts);
 
     return (
       <div>
@@ -63,8 +68,5 @@ export class FetchData extends Component {
     this.setState({ forecasts: data, loading: false });
   }
   
-  static formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toString().slice(0, 24);
-  }
+
 }

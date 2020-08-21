@@ -1,9 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using TaskManager.Models;
 using Task = TaskManager.Models.Task;
 
-namespace TaskManager
+namespace TaskManager.Models
 {
     public class DatabaseContext : DbContext
     {

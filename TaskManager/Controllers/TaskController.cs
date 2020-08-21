@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using TaskManager.Models;
 using Task = TaskManager.Models.Task;
 
 namespace TaskManager.Controllers
@@ -18,15 +19,17 @@ namespace TaskManager.Controllers
             _context = context;
         }
         
-
+        // GET: /task/get/id?
         [HttpGet]
         public async Task<IEnumerable<Task>> Get(int? id)
         {
             return await _context.Tasks.ToListAsync();
         }
 
+        
+        // POST: /task/add
         [HttpPost]
-        public async Task<IActionResult> Post(string jsonTask)
+        public async Task<IActionResult> Add(string jsonTask)
         {
             var task = (jsonTask != null) ? JsonConvert.DeserializeObject<Task>(jsonTask) : new Task();
             await _context.Tasks.AddAsync(task);
