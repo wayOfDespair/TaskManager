@@ -10,7 +10,7 @@ using Task = TaskManager.Models.Task;
 namespace TaskManager.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class TaskController : Controller
     {
         private readonly DatabaseContext _context;
@@ -36,7 +36,8 @@ namespace TaskManager.Controllers
             if (!task.IsValid())
                 return BadRequest($"Invalid task \n{task}");
 
-            task.TaskId = await _context.Tasks.CountAsync() + 1;
+            var lastTask = await _context.Tasks.OrderByDescending(t => t.TaskId).FirstAsync();
+            task.TaskId = lastTask.TaskId + 1;
             task.Author = await _context.Employees.FindAsync(task.AuthorId);
             await _context.Tasks.AddAsync(task);
             await _context.SaveChangesAsync();

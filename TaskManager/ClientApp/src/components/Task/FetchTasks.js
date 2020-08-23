@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
-export class FetchData extends Component {
-  static displayName = FetchData.name;
+export class FetchTasks extends Component {
+  static displayName = FetchTasks.name;
 
   constructor(props) {
     super(props);
@@ -9,7 +9,7 @@ export class FetchData extends Component {
   }
 
   componentDidMount() {
-    this.populateTasks();
+    this.populateTasks().then(response => console.log(response)).catch(reason => console.log(reason));
   }
 
   static renderTasksTable(tasks) {
@@ -30,7 +30,7 @@ export class FetchData extends Component {
           {tasks.map(task =>
             <tr key={task.id}>
               <td>{task.taskId}</td>
-              <td>{task.author}</td>
+              <td>{task.author == null ? '' : task.author.name}</td>
               <td>{task.description}</td>
               <td>{task.priority}</td>
               <td>{task.severity}</td>
@@ -51,7 +51,7 @@ export class FetchData extends Component {
   render() {
     let contents = this.state.loading
       ? <p><em>Loading...</em></p>
-      : FetchData.renderTasksTable(this.state.forecasts);
+      : FetchTasks.renderTasksTable(this.state.forecasts);
 
     return (
       <div>
@@ -63,10 +63,8 @@ export class FetchData extends Component {
   }
 
   async populateTasks() {
-    const response = await fetch('task');
+    const response = await fetch('api/task');
     const data = await response.json();
     this.setState({ forecasts: data, loading: false });
   }
-  
-
 }

@@ -1,5 +1,4 @@
 ﻿import React, { Component } from 'react';
-import { PostForm } from "./PostForm";
 
 export class FetchDepartments extends Component {
     static displayName = FetchDepartments.name
@@ -53,7 +52,6 @@ export class FetchDepartments extends Component {
             <div>
                 <h1 id='tableLabel'>Departments list</h1>
                 {content}
-                <PostForm />
             </div>
         )
     }
