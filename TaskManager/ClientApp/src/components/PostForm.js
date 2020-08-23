@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import Axios from "axios";
+import {FetchDepartments} from "./FetchDepartments";
 
 export class PostForm extends Component{
     constructor(props) {

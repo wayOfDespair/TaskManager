@@ -1,12 +1,15 @@
 ﻿import React, { Component } from 'react';
-import {PostForm} from "./PostForm";
+import { PostForm } from "./PostForm";
 
 export class FetchDepartments extends Component {
     static displayName = FetchDepartments.name
     
     constructor(props) {
         super(props);
-        this.state = { departments: [], loading: true, value: null };
+        this.state = {
+            departments: [],
+            loading: true
+        };
     }
     
     componentDidMount() {
@@ -38,7 +41,7 @@ export class FetchDepartments extends Component {
     
     static getEmployees(employees) {
         if (employees == null) return "Empty list";
-        else return employees.map(employee => employee.name);
+        else return employees.map(employee => employee.name + "\n");
     }
     
     render() {

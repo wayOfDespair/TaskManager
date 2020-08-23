@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Task = TaskManager.Models.Task;
 
 namespace TaskManager.Models
 {
@@ -18,7 +17,7 @@ namespace TaskManager.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Department>().HasData(new {DepartmentId = 1, Name = "Development department"});
-            modelBuilder.Entity<Employee>().HasData(new {EmployeeId = 1, Name = "Name", LastName = "Lastname"});
+            modelBuilder.Entity<Employee>().HasData(new {EmployeeId = 1, Name = "Name", LastName = "Lastname", DepartmentId = 1});
             modelBuilder.Entity<Task>().HasData(new
             {
                 TaskId = 1,
@@ -26,7 +25,8 @@ namespace TaskManager.Models
                 Severity = 1,
                 Description = "Test task",
                 DateCreated = DateTime.Now,
-                ExpirationDate = DateTime.Now.AddDays(2)
+                ExpirationDate = DateTime.Now.AddDays(2),
+                AuthorId = 1
             });
         }
     }
