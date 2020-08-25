@@ -1,19 +1,21 @@
 ﻿import React, { Component } from 'react';
-import {FetchTasks} from "./FetchTasks";
-import {TaskAddForm} from "./TaskAddForm";
+import { FetchTasks } from "./FetchTasks";
+import { TaskAddForm } from "./TaskAddForm";
+import { EditTaskForm } from "./EditTaskForm"
 
 export class Tasks extends Component{
+
+  constructor(props) {
+    super(props);
+  }
     
-    constructor(props) {
-        super(props);
-    }
-    
-    render() {
-        return (
-            <div>
-                <TaskAddForm />
-                <FetchTasks />
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div>
+      <TaskAddForm />
+      <EditTaskForm />
+      <FetchTasks />
+      </div>
+    )
+  }
 }

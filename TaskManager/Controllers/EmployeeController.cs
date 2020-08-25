@@ -18,17 +18,42 @@ namespace TaskManager.Controllers
         {
             _context = context;
         }
+        
+        /// <summary>
+        /// Return employees collection.
+        /// </summary>
+        /// <returns></returns>
 
-        // GET: /employee/id?
-        [HttpGet("{id}")]
-        public async Task<IEnumerable<Employee>> GetEmployeesList(int? id)
+        // GET: api/employee/
+        [HttpGet]
+        public async Task<IEnumerable<Employee>> GetEmployeesList()
         {
-            return id > 0 && id < await _context.Employees.CountAsync()
-                ? await _context.Employees.Where(e => e.EmployeeId == id).ToListAsync()
-                : await _context.Employees.ToListAsync();
+            return await _context.Employees.Include(employee => employee.Tasks).ToListAsync();
+        }
+        
+        /// <summary>
+        /// Return a specific employee by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        
+        // GET: api/employee/id
+        [HttpGet("{id}")]
+        public async Task<Employee> GetEmployee(int id)
+        {
+            return await _context.Employees
+                .Include(employee => employee.Tasks)
+                .Include(employee => employee.Department)
+                .SingleOrDefaultAsync(employee => employee.EmployeeId == id);
         }
 
-        // POST: /employee
+        /// <summary>
+        /// Create a new employee.
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        
+        // POST: api/employee
         [HttpPost]
         public async Task<IActionResult> CreateEmployee(Employee employee)
         {
@@ -45,7 +70,14 @@ namespace TaskManager.Controllers
             return Ok();
         }
         
-        // PUT: /employee/id
+        /// <summary>
+        /// Edit an existing employee by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="employeeChanged"></param>
+        /// <returns></returns>
+        
+        // PUT: api/employee/id
         [HttpPut("{id}")]
         public async Task<IActionResult> EditEmployee(int id, Employee employeeChanged)
         {
@@ -58,13 +90,25 @@ namespace TaskManager.Controllers
                 return BadRequest("Invalid employee\n" + employeeChanged);
 
             var employee = await _context.Employees.FindAsync(id);
-            employee = employeeChanged;
+            employee.Name = employeeChanged.Name;
+            employee.LastName = employeeChanged.LastName;
+            employee.DepartmentId = employeeChanged.DepartmentId;
+            employee.Department = employee.Department;
+            employee.Tasks = employeeChanged.Tasks;
+
+            _context.Employees.Update(employee);
             await _context.SaveChangesAsync();
             
             return Ok(HttpStatusCode.OK);
         }
         
-        // DELETE: /employee/id
+        /// <summary>
+        /// Delete a specific employee by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        
+        // DELETE: api/employee/id
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveEmployee(int id)
         {

@@ -19,21 +19,45 @@ namespace TaskManager.Controllers
             _context = context;
         }
 
-        // GET: /department/id?
-        [HttpGet("{id?}")]
-        public async Task<IEnumerable<Department>> GetDepartmentsList(int? id)
+        /// <summary>
+        /// Return departments collection.
+        /// </summary>
+        /// <returns></returns>
+        
+        // GET: api/department/
+        [HttpGet]
+        public async Task<IEnumerable<Department>> GetDepartmentsList()
         {
-            return id > 0 && id < await _context.Employees.CountAsync()
-                ? await _context.Departments.Where(d => d.DepartmentId == id).ToListAsync()
-                : await _context.Departments.ToListAsync();
+            return await _context.Departments.Include(d => d.Employees).ToListAsync();
         }
         
-        // POST: /department
+        /// <summary>
+        /// Return a specific department by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        
+        // GET: api/department/id
+        [HttpGet("{id}")]
+        public async Task<Department> GetDepartment(int id)
+        {
+            return await _context.Departments
+                .Include(department => department.Employees)
+                .ThenInclude(employee => employee.Tasks)
+                .SingleOrDefaultAsync(department => department.DepartmentId == id);
+        }
+        
+        /// <summary>
+        /// Create a new department.
+        /// </summary>
+        /// <param name="department"></param>
+        /// <returns></returns>
+        
+        // POST: api/department
         [HttpPost]
         public async Task<IActionResult> CreateDepartment(Department department)
         {
-            if (!department.IsValid())
-                return BadRequest("Invalid department");
+            if (!department.IsValid()) return BadRequest("Invalid department");
             
             department.DepartmentId = await _context.Departments.CountAsync() + 1;
             await _context.Departments.AddAsync(department);
@@ -42,7 +66,14 @@ namespace TaskManager.Controllers
             return Ok(HttpStatusCode.OK);
         }
         
-        // PUT: /department/id
+        /// <summary>
+        /// Edit an existing department by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="departmentChanged"></param>
+        /// <returns></returns>
+        
+        // PUT: api/department/id
         [HttpPut("{id}")]
         public async Task<IActionResult> EditDepartment(int id, Department departmentChanged)
         {
@@ -52,13 +83,22 @@ namespace TaskManager.Controllers
                 return BadRequest("Invalid department\n" + departmentChanged);
 
             var department = await _context.Departments.FindAsync(id);
-            department = departmentChanged;
+            department.Name = departmentChanged.Name;
+            department.Employees = departmentChanged.Employees;
+            
+            _context.Departments.Update(department);
             await _context.SaveChangesAsync();
 
             return Ok(HttpStatusCode.OK);
         }
         
-        // DELETE: /department/id
+        /// <summary>
+        /// Delete a specific department by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        
+        // DELETE: api/department/id
         [HttpDelete("{id?}")]
         public async Task<IActionResult> RemoveDepartment(int id)
         {

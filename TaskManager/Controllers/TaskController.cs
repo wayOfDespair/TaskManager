@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Models;
-using Task = TaskManager.Models.Task;
 
 namespace TaskManager.Controllers
 {
@@ -20,53 +19,98 @@ namespace TaskManager.Controllers
             _context = context;
         }
         
-        // GET: /task/id?
-        [HttpGet("{id?}")]
-        public async Task<IEnumerable<Task>> GetTasksList(int? id)
+        
+        /// <summary>
+        /// Return tasks collection.
+        /// </summary>
+        /// <returns></returns>
+        
+        // GET: api/taskItem/
+        [HttpGet]
+        public async Task<IEnumerable<TaskItem>> GetTasksList()
         {
-            return id > 0 && id < await _context.Employees.CountAsync()
-                ? await _context.Tasks.Where(t => t.TaskId == id).ToListAsync()
-                : await _context.Tasks.ToListAsync();
+            return await _context.Tasks
+                .Include(task => task.Author)
+                .ToListAsync();
         }
         
-        // POST: /task
-        [HttpPost]
-        public async Task<IActionResult> CreateTask(Task task)
+        /// <summary>
+        /// Return a specific task by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// 
+        // GET: api/taskItem/id
+        [HttpGet("{id}")]
+        public async Task<TaskItem> GetTask(int id)
         {
-            if (!task.IsValid())
-                return BadRequest($"Invalid task \n{task}");
+            return await _context.Tasks
+                .Include(taskItem => taskItem.Author)
+                .SingleOrDefaultAsync(taskItem => taskItem.TaskId == id);
+        }
+        
+        /// <summary>
+        /// Create a new task.
+        /// </summary>
+        /// <param name="taskItem"></param>
+        /// <returns></returns>
+        
+        // POST: api/taskItem
+        [HttpPost]
+        public async Task<IActionResult> CreateTask(TaskItem taskItem)
+        {
+            if (!taskItem.IsValid()) return  BadRequest($"Invalid taskItem \n{taskItem}");
 
             var lastTask = await _context.Tasks.OrderByDescending(t => t.TaskId).FirstAsync();
-            task.TaskId = lastTask.TaskId + 1;
-            task.Author = await _context.Employees.FindAsync(task.AuthorId);
-            await _context.Tasks.AddAsync(task);
+            taskItem.TaskId = lastTask.TaskId + 1;
+            taskItem.Author = await _context.Employees.FindAsync(taskItem.AuthorId);
+            await _context.Tasks.AddAsync(taskItem);
             await _context.SaveChangesAsync();
             
             return Ok();
         }
         
-        // PUT: /task/id
+        
+        /// <summary>
+        /// Edit an existing task by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="taskItemChanged"></param>
+        /// <returns></returns>
+        /// 
+        // PUT: api/taskItem/id
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditTask(int id, Task taskChanged)
+        public async Task<IActionResult> EditTask(int id, TaskItem taskItemChanged)
         {
-            if (id < 0 || id > await _context.Tasks.CountAsync())
-                return BadRequest("Invalid id\n" + id);
-            if (!taskChanged.IsValid())
-                return BadRequest("Invalid task\n" + taskChanged);
+            if (id < 0 || id > await _context.Tasks.CountAsync()) return BadRequest("Invalid id\n" + id);
+            if (!taskItemChanged.IsValid()) return BadRequest("Invalid taskItem\n" + taskItemChanged);
 
             var task = await _context.Tasks.FindAsync(id);
-            task = taskChanged;
+            task.Description = taskItemChanged.Description;
+            task.Priority = taskItemChanged.Priority;
+            task.Severity = taskItemChanged.Severity;
+            task.AuthorId = task.AuthorId;
+            task.Author = taskItemChanged.Author;
+            task.ExpirationDate = task.ExpirationDate;
+            task.IsCompleted = taskItemChanged.IsCompleted;
+            
+            _context.Tasks.Update(task);
             await _context.SaveChangesAsync();
             
             return Ok(HttpStatusCode.OK);
         }
         
-        // DELETE: /task/id
+        /// <summary>
+        /// Delete a specific task by id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        
+        // DELETE: api/taskItem/id
         [HttpDelete("{id}")]
         public async Task<IActionResult> RemoveTask(int id)
         {
-            if (id < 0 || id > await _context.Tasks.CountAsync())
-                return BadRequest("Invalid id");
+            if (id < 0 || id > await _context.Tasks.CountAsync()) return BadRequest("Invalid id");
 
             var task = await _context.Tasks.FindAsync(id);
             _context.Remove(task);

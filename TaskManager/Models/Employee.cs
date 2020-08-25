@@ -17,7 +17,7 @@ namespace TaskManager.Models
         public int DepartmentId { get; set; }
         
         public Department Department { get; set; }
-        public List<Task> Tasks { get; set; }
+        public List<TaskItem> Tasks { get; set; }
 
         public bool IsValid()
         {

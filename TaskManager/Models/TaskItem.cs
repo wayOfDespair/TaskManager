@@ -3,17 +3,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TaskManager.Models
 {
-    public class Task
+    public class TaskItem
     {
+        [Key]
         public int TaskId { get; set; }
         
         [Required]
         public string Description { get; set; }
         
+        [Required]
         public int Priority { get; set; }
+        
+        [Required]
         public int Severity { get; set; }
         
+        [Required]
+        public bool IsCompleted { get; set; }
+        
+        [Required]
         public DateTime DateCreated { get; set; }
+        
+        [Required]
         public DateTime ExpirationDate { get; set; }
         
         [Required]
@@ -28,7 +38,7 @@ namespace TaskManager.Models
 
         public override string ToString()
         {
-            return $"Task #{TaskId} {Description}, created by {Author} at {DateCreated}";
+            return $"TaskItem #{TaskId} {Description}, created by {Author} at {DateCreated}";
         }
     }
 }

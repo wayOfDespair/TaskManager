@@ -1,5 +1,4 @@
 ﻿import React, { Component } from 'react';
-import Axios from "axios";
 
 export class TaskAddForm extends Component{
 
@@ -11,40 +10,45 @@ export class TaskAddForm extends Component{
       severity: null,
       dateCreated: null,
       expirationDate: null,
-      authorId: null
+      authorId: null,
+      isCompleted: false
     }
   }
 
   render() {
     return (
-      <form id="add-task__form" onSubmit={this.handleSubmit}>
-        <table>
-          <tr>
-            <td><label>Description:</label></td>
-            <td><input type="text" placeholder="Description" onChange={this.handleDescriptionChange} /></td>
-          </tr>
-          <tr>
-            <td><label>Priority:</label></td>
-            <td><input type="text" placeholder="Priority" onChange={this.handlePriorityChange} /></td>
-          </tr>
-          <tr>
-            <td><label>Severity:</label></td>
-            <td><input type="text" placeholder="Severity" onChange={this.handleSeverityChange} /></td>
-          </tr>
-          <tr>
-            <td><label>Expiration date:</label></td>
-            <td><input type="date" placeholder="Expiration date" onChange={this.handleExpirationDateChange} /></td>
-          </tr>
-          <tr>
-            <td><label>Author id:</label></td>
-            <td><input type="text" placeholder="Author id" onChange={this.handleAuthorIdChange} /></td>
-          </tr>
-          <tr>
-            <td> </td>
-            <td><button onSubmit={this.handleSubmit}>Add task</button></td>
-          </tr>
-        </table>
-      </form>
+      <div>
+        <h1>Add task form</h1>
+        <form id="add-task__form" onSubmit={this.handleSubmit} style={{height: "30%", width: "50%"}}>
+          <div className="form-group">
+            <label htmlFor="descriptionInput">Description:</label>
+            <textarea className="form-control" id="descriptionInput" rows="2" placeholder="Description"
+                      onChange={this.handleDescriptionChange}/>
+          </div>
+          <div className="form-group">
+            <label htmlFor="priorityInput">Priority:</label>
+            <input className="form-control" id="priorityInput" type="text" placeholder="Priority"
+                   onChange={this.handlePriorityChange}/>
+          </div>
+          <div className="form-group">
+            <label htmlFor="severityInput">Severity:</label>
+            <input className="form-control" id="severityInput" type="text" placeholder="Severity"
+                   onChange={this.handleSeverityChange}/>
+          </div>
+          <div className="form-group">
+            <label htmlFor="expirationDateInput">Expiration date:</label>
+            <input className="form-control" id="expirationDateInput" type="datetime-local"
+                   min={new Date(Date.now()).toISOString()}
+                   onChange={this.handleExpirationDateChange}/>
+          </div>
+          <div className="form-group">
+            <label htmlFor="authorIdInput">Author id:</label>
+            <input className="form-control" id="authorIdInput" type="text" placeholder="Author id"
+                   onChange={this.handleAuthorIdChange}/>
+          </div>
+          <button className="btn btn-primary" onSubmit={this.handleSubmit}>Add task</button>
+        </form>
+      </div>
     )
   }
 
@@ -59,11 +63,10 @@ export class TaskAddForm extends Component{
   handleSeverityChange = (event) => {
     this.setState({ severity: parseInt(event.target.value) });
   }
-
-
+  
   handleExpirationDateChange = (event) => {
     this.setState({ dateCreated: new Date(Date.now()).toISOString()});
-    this.setState({ expirationDate: new Date(Date.parse(event.target.value)).toISOString() });
+    this.setState({ expirationDate: event.target.value });
   }
 
   handleAuthorIdChange = (event) => {
@@ -71,9 +74,9 @@ export class TaskAddForm extends Component{
   }
 
   handleSubmit = (event) => {
-    document.getElementById("add-task__form").reset();
     event.preventDefault();
-    this.sendData();
+    this.sendData().then(response => console.log(response));
+    document.getElementById("add-task__form").reset();
   }
 
   sendData = async () => {

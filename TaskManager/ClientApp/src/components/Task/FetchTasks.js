@@ -12,7 +12,21 @@ export class FetchTasks extends Component {
     this.populateTasks().then(response => console.log(response)).catch(reason => console.log(reason));
   }
 
-  static renderTasksTable(tasks) {
+  render() {
+    let contents = this.state.loading
+      ? <p><em>Loading...</em></p>
+      : this.renderTasksTable(this.state.forecasts);
+
+    return (
+      <div>
+        <h1 id="tabelLabel" >Tasks list</h1>
+        <p>This component demonstrates fetching data from the server.</p>
+        {contents}
+      </div>
+    );
+  }
+  
+  renderTasksTable = (tasks) => {
     return (
       <table className='table table-striped' aria-labelledby="tabelLabel">
         <thead>
@@ -27,8 +41,10 @@ export class FetchTasks extends Component {
           </tr>
         </thead>
         <tbody>
-          {tasks.map(task =>
-            <tr key={task.id}>
+          {tasks.sort((a, b) => {
+            return a.taskId - b.taskId;
+          }).map(task =>
+            <tr key={task.taskId}>
               <td>{task.taskId}</td>
               <td>{task.author == null ? '' : task.author.name}</td>
               <td>{task.description}</td>
@@ -43,26 +59,12 @@ export class FetchTasks extends Component {
     );
   }
 
-  static formatDate(dateString) {
+  formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toString().slice(0, 24);
   }
-
-  render() {
-    let contents = this.state.loading
-      ? <p><em>Loading...</em></p>
-      : FetchTasks.renderTasksTable(this.state.forecasts);
-
-    return (
-      <div>
-        <h1 id="tabelLabel" >Tasks list</h1>
-        <p>This component demonstrates fetching data from the server.</p>
-        {contents}
-      </div>
-    );
-  }
-
-  async populateTasks() {
+  
+  populateTasks = async () => {
     const response = await fetch('api/task');
     const data = await response.json();
     this.setState({ forecasts: data, loading: false });
